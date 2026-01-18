@@ -36,9 +36,23 @@ app.use(cors(corsOptions));
 // Static folder for PDF uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Test route to verify server is working
+app.get('/api/test', (req, res) => {
+  res.json({ success: true, message: 'API is working' });
+});
+
 // Routes
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api', require('./routes/jobRoutes'));
+try {
+  const adminRoutes = require('./routes/adminRoutes');
+  const jobRoutes = require('./routes/jobRoutes');
+  
+  app.use('/api/admin', adminRoutes);
+  app.use('/api', jobRoutes);
+  
+  console.log('✅ Routes loaded successfully');
+} catch (error) {
+  console.error('❌ Error loading routes:', error.message);
+}
 
 // Health check
 app.get('/health', (req, res) => {
