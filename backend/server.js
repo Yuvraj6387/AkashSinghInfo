@@ -36,28 +36,36 @@ app.use(cors(corsOptions));
 // Static folder for PDF uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Test route to verify server is working
+// Simple test routes first
 app.get('/api/test', (req, res) => {
-  res.json({ success: true, message: 'API is working' });
+  res.json({ success: true, message: 'API is working', time: new Date() });
 });
 
-// Routes
-try {
-  const adminRoutes = require('./routes/adminRoutes');
-  const jobRoutes = require('./routes/jobRoutes');
-  
-  app.use('/api/admin', adminRoutes);
-  app.use('/api', jobRoutes);
-  
-  console.log('✅ Routes loaded successfully');
-} catch (error) {
-  console.error('❌ Error loading routes:', error.message);
-}
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'Server is running' });
+app.get('/api/health', (req, res) => {
+  res.json({ success: true, status: 'Backend is running' });
 });
+
+// Routes - Direct inline to test
+const jobController = require('./controllers/jobController');
+const adminController = require('./controllers/adminController');
+const authMiddleware = require('./middleware/auth');
+const upload = require('./middleware/upload');
+
+// Admin routes
+app.post('/api/admin/login', adminController.adminLogin);
+app.get('/api/admin/verify', authMiddleware, adminController.verifyToken);
+app.post('/api/admin/logout', authMiddleware, adminController.adminLogout);
+
+// Job routes
+app.get('/api/jobs', jobController.getAllJobs);
+app.get('/api/jobs/search', jobController.searchJobs);
+app.get('/api/jobs/:id', jobController.getJobById);
+app.get('/api/jobs/:id/download', jobController.downloadPDF);
+app.post('/api/jobs', authMiddleware, upload.single('pdf'), jobController.createJob);
+app.put('/api/jobs/:id', authMiddleware, upload.single('pdf'), jobController.updateJob);
+app.delete('/api/jobs/:id', authMiddleware, jobController.deleteJob);
+
+console.log('✅ All routes registered');
 
 // Error handling middleware
 app.use((err, req, res, next) => {
