@@ -57,19 +57,24 @@ server.on('error', (err) => {
   }
   process.exit(1);
 });
-
 // Database Connection (async, non-blocking)
-mongoose
-  .connect(process.env.MONGODB_URI, { 
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 5000,
-  })
-  .then(() => {
-    console.log('MongoDB connected successfully');
-  })
-  .catch((err) => {
-    console.error('MongoDB connection error:', err.message);
-    console.log('Server running without database connection. Using mock data.');
-  });
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/government-portal';
+
+if (!mongoUri || mongoUri === 'undefined') {
+  console.log('⚠️ MongoDB URI not set. Using mock data mode.');
+} else {
+  mongoose
+    .connect(mongoUri, { 
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 5000,
+    })
+    .then(() => {
+      console.log('✅ MongoDB connected successfully');
+    })
+    .catch((err) => {
+      console.error('❌ MongoDB connection error:', err.message);
+      console.log('📦 Server running without database connection. Using mock data.');
+    });
+}
 
 module.exports = app;
