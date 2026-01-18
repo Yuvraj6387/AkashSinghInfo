@@ -14,6 +14,9 @@ exports.adminLogin = async (req, res) => {
     const validUsername = process.env.ADMIN_USERNAME;
     const validPassword = process.env.ADMIN_PASSWORD;
 
+    // Debug logging
+    console.log('Login attempt:', { username, validUsername, password: password ? '***' : 'empty', validPassword: validPassword ? '***' : 'empty' });
+
     if (username === validUsername && password === validPassword) {
       const token = jwt.sign(
         { username, role: 'admin' },
@@ -28,6 +31,7 @@ exports.adminLogin = async (req, res) => {
         admin: { username },
       });
     } else {
+      console.log('Invalid credentials:', { username, password, validUsername, validPassword });
       res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
   } catch (error) {
