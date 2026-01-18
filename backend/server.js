@@ -58,7 +58,7 @@ server.on('error', (err) => {
   process.exit(1);
 });
 // Database Connection (async, non-blocking)
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/government-portal';
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://yuvipaji222002_db_user:hEFFjombdBzyLgD2@cluster0.zgi5dg3.mongodb.net/?appName=Cluster0';
 
 if (!mongoUri || mongoUri === 'undefined') {
   console.log('⚠️ MongoDB URI not set. Using mock data mode.');
